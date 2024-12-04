@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?Declaration Don't modify the file manually,  its created automaticlly?>
+<Upload>
+<TemplateGroup>
+    <Template name="TPL_QSEE_TZ_LOG">
+        <Path FaultLevel="CRITICAL" PrivacyLevel="L3" path="cache/qseelog/qsee_log_00"/>
+        <Path FaultLevel="CRITICAL" PrivacyLevel="L3" path="cache/qseelog/tzlog_00"/>
+        <Cmd FaultLevel="CRITICAL" PrivacyLevel="L3" run="cat /proc/tzdbg/qsee_log" option="block=5" output="qsee_log"/>
+        <Cmd FaultLevel="CRITICAL" PrivacyLevel="L3" run="cat /proc/tzdbg/log" option="block=5" output="tz_log"/>
+        <Path FaultLevel="CRITICAL" PrivacyLevel="L3" path="/data/vendor/mitee/mitee.log"/>
+    </Template>
+
+    <Template name="TPL_QC_DRIVER_LOG">
+        <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/wlan_logs/" pattern="host_driver_logs_\d{3}.txt" option="latest=3"/>
+        <Path FaultLevel="IMPORTANT" PrivacyLevel="L3" path="/data/vendor/wlan_logs/host_driver_logs_current.txt"/>
+    </Template>
+
+    <Template name="TPL_QC_FW_LOG">
+        <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/wlan_logs/" pattern="cnss_fw_logs_\d{3}.txt" option="latest=5"/>
+        <Path FaultLevel="IMPORTANT" PrivacyLevel="L3" path="/data/vendor/wlan_logs/cnss_fw_logs_current.txt"/>
+    </Template>
+
+    <Template name="TPL_QC_TCPDUMP_LOG">
+        <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/wlan_logs/" pattern="tcpdump.pcap[0-3]?" option="latest=3"/>
+    </Template>
+
+    <Template name="TPL_BASE_LOGCAT_LOG">
+        <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="logcat" output="logcat.log" option="around=10"/>
+    </Template>
+
+    <Template name="TPL_BASE_LOGCAT_LOG_EVENT">
+        <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="logcat -b events -t 5000" output="logcat_event.log"/>
+    </Template>
+
+    <Template name="TPL_BASE_LOGCAT_LOG_RADIO">
+        <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="logcat -b radio" output="logcat_radio.log" option="around=10"/>
+    </Template>
+
+    <Template name="TPL_BASE_LOGCAT_LOG_ALL">
+      <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="logcat -b all" output="logcat_all.log" option="around=10"/>
+    </Template>
+
+    <Template name="TPL_BASE_DMESG_LOG">
+        <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="dmesg" output="dmesg_kernel.log"/>
+    </Template>
+
+    <Template name="TPL_QC_BTDUMP_LOG">
+        <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="dumpsys bluetooth_manager" output="dump.log"/>
+    </Template>
+
+    <Template name="TPL_QC_WLAN_LOG">
+        <Import template="TPL_QC_DRIVER_LOG"/>
+        <Import template="TPL_QC_FW_LOG"/>
+        <Import template="TPL_QC_TCPDUMP_LOG"/>
+    </Template>
+
+    <Template name="TPL_QC_DUMPSYS_WIFI">
+        <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys wifi" output="dumpsys_wifi.log"/>
+    </Template>
+  
+    <Template name="TPL_QC_DUMPSYS_Modem">
+        <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="diag_mdlog -q 0x2006 -j 1 -u -c -i -n 50" output="dumpsys_modem.log"/>
+    </Template>
+
+</TemplateGroup>
+
+<Event range1="902005000" range2="902003001" range3="902001206">
+    <Cmd FaultLevel="GENERAL" PrivacyLevel="L3" run="dumpsys misight plugin PerfLogAnalyzer" output="perf_log_analyzer.log"/>
+    <Import template="TPL_BASE_LOGCAT_LOG_ALL"/>
+</Event>
+
+<Event min="903000000" max="903999999">
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys batterystats" output="BatteryStats.log" extra="logRequired:\w*a\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys batterystats -c" output="BatteryStatsCheckin.log" extra="logRequired:\w*a\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys power" output="PowerManager.log" extra="logRequired:\w*b\w*"/>
+
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/wlan_logs/" pattern="host_driver_logs_\d{3}.txt" option="latest=3" extra="logRequired:\w*c\w*"/>
+    <Path FaultLevel="IMPORTANT" PrivacyLevel="L3" path="/data/vendor/wlan_logs/host_driver_logs_current.txt" extra="logRequired:\w*c\w*"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/wlan_logs/" pattern="cnss_fw_logs_\d{3}.txt" option="latest=5" extra="logRequired:\w*c\w*"/>
+    <Path FaultLevel="IMPORTANT" PrivacyLevel="L3" path="/data/vendor/wlan_logs/cnss_fw_logs_current.txt" extra="logRequired:\w*c\w*"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/wlan_logs/" pattern="tcpdump.pcap[0-3]?" option="latest=3" extra="logRequired:\w*c\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys wifi" output="dumpsys_wifi.log" extra="logRequired:\w*c\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys wifiscanner" output="dumpsys_wifiscanner.log" extra="logRequired:\w*c\w*"/>
+
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys bluetooth_manager" output="dumpsys_bluetooth_manager.log" extra="logRequired:\w*d\w*"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/misc/bluetooth/logs/" pattern="btsnoop_hci.*(log|last|filtered)$" extra="logRequired:\w*d\w*"/>
+
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys sensorservice" output="dumpsys_sensorservice.log" extra="logRequired:\w*e\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys telephony.registry" output="dumpsys_telephony.log" extra="logRequired:\w*f\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys netpolicy" output="dumpsys_netpolicy.log" extra="logRequired:\w*g\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys network_stack" output="dumpsys_network_stack.log" extra="logRequired:\w*g\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys netd" output="dumpsys_netd.log" extra="logRequired:\w*g\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys network_management" output="dumpsys_network_management.log" extra="logRequired:\w*g\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dmesg" output="dmesg_kernel.log" extra="logRequired:\w*h\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys vpn_management" output="dumpsys_vpn_management.log" extra="logRequired:\w*i\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys tethering" output="dumpsys_tethering.log" extra="logRequired:\w*j\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys input" output="dumpsys_input.log" extra="logRequired:\w*k\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="logcat -t 5000" output="logcat.log" extra="logRequired:\w*m\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="logcat -b radio -t 5000" output="logcat_radio.log" extra="logRequired:\w*n\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="logcat -b events -t 5000" output="logcat_events.log" extra="logRequired:\w*o\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys deviceidle" output="dumpsys_deviceidle.log" extra="logRequired:\w*q\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys cpuinfo" output="dumpsys_cpuinfo.log" extra="logRequired:\w*r\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys settings" output="dumpsys_settings.log" extra="logRequired:\w*s\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys nfc" output="dumpsys_nfc.log" extra="logRequired:\w*t\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys alarm" output="dumpsys_alarm.log" extra="logRequired:\w*u\w*"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys jobscheduler" output="dumpsys_jobscheduler.log" extra="logRequired:\w*v\w*"/>
+</Event>
+
+<Event range1="906001001" range2="906001351-906001354" range3="906201001-906201004" range4="906202001-906202002">
+    <Import template="TPL_BASE_DMESG_LOG"/>
+</Event>
+
+<Event range1="906001051" range2="906001301" range3="906201005">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+</Event>
+
+<Event range1="906002001-906002005" range2="906100001-906100003" range3="906121001" range4="906130001" range5="906140001" range6="906001151-906001155" range7="906150001-906150002">
+    <Import template="TPL_BASE_DMESG_LOG"/>
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+</Event>
+
+<Event range1="904001001-904001004" range2="904002001-904002002" range3="904003001" range4="904004001-904004003" range5="904005001-904005005" range6="904006001-904006004" range7="904008001-904008004" range8="904009001-904009002" range9="904011001-904011005">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QSEE_TZ_LOG"/>
+</Event>
+
+  <Event min="901001001" max="901001001">
+    <Import template="TPL_BASE_LOGCAT_LOG_ALL"/>
+    <Import template="TPL_BASE_DMESG_LOG"/>
+  </Event>
+
+  <Event min="901001002" max="901001002">
+    <Import template="TPL_BASE_LOGCAT_LOG_ALL"/>
+    <Import template="TPL_BASE_DMESG_LOG"/>
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/anr" pattern="BinderTraces_.*" option="latest=1"/>
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/anr" pattern="traces_SystemServer_WDT.*" option="latest=1"/>
+  </Event>
+
+  <Event min="901001003" max="901001003">
+    <Import template="TPL_BASE_LOGCAT_LOG_ALL"/>
+    <Import template="TPL_BASE_DMESG_LOG"/>
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/tombstones" pattern="tombstone_.*" option="latest=2"/>
+  </Event>
+
+  <Event min="901003001" max="901003001">
+    <Import template="TPL_BASE_LOGCAT_LOG_ALL"/>
+    <Import template="TPL_BASE_DMESG_LOG"/>
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/anr" pattern="BinderUsage_.*" option="latest=1"/>
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/anr" pattern="anr_.*" option="latest=1"/>
+  </Event>
+
+<Event min="901004201" max="901004201">
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/miuilog/stability/memleak/dmabuf/" pattern="memleak_[\w-]+_dmabuf_leak_0\.zip" option="latest=1"/>
+</Event>
+
+<Event min="901004202" max="901004202">
+    <DynamicPath FaultLevel="GENERAL" PrivacyLevel="L3" dir="/data/miuilog/stability/memleak/gpu/" pattern="memleak_[\w-]+_GpuMemory_leak_0\.zip" option="latest=1"/>
+</Event>
+
+<Event range1="917011001-917011002" range2="917043204" range3="917042101" range4="917043001" range5="917053001" range6="917061001">
+    <Import template="TPL_QC_BTDUMP_LOG"/>
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/misc/bluetooth/logs/" pattern="btsnoop_hci.*(log|last|filtered)$"/>
+</Event>
+
+<Event range1="917012001">
+    <Import template="TPL_QC_BTDUMP_LOG"/>
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/misc/bluetooth/logs/" pattern="btsnoop_hci.*(log|last|filtered)$"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/ssrdump" pattern="ramdump.*(log|bin)$" option="latest=6"/>
+</Event>
+
+<Event range1="916011007" range2="916012002-916012003" range3="916024001-916024002" range4="916032001" range5="916051001">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QC_WLAN_LOG"/>
+</Event>
+
+<Event min="916013001" max="916013003">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QC_TCPDUMP_LOG"/>
+</Event>
+
+<Event min="916031001" max="916031001">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QC_DRIVER_LOG"/>
+    <Import template="TPL_QC_FW_LOG"/>
+</Event>
+
+<Event min="902051001" max="902053002">
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys cpuinfo" output="cpuinfo.log"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys xiaomi.joyose" output="joyose.log"/>
+</Event>
+
+<Event range1="916061002">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QC_WLAN_LOG"/>
+    <Import template="TPL_BASE_DMESG_LOG"/>
+</Event>
+
+<Event range1="911001004" range2="911001004">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+</Event>
+<Event min="912001005" max="912001005">
+    <Import template="TPL_BASE_DMESG_LOG"/>
+</Event>
+<Event range1="913001001">
+    <Cmd FaultLevel="CRITICAL" PrivacyLevel="L3" run="dumpsys sensorservice" output="SensorService.log"/>
+</Event>
+
+<Event min="905001003" max="905001011">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys cpuinfo" output="cpuinfo.log"/>
+    <DynamicPath FaultLevel="IMPORTANT" PrivacyLevel="L3" dir="/data/vendor/thermal/" pattern=".*thermal.dump"/>
+</Event>
+<Event range1="914001002-914001003" range2="914002001-914002002" range3="914003001-914003003">
+    <Import template="TPL_BASE_DMESG_LOG"/>
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QSEE_TZ_LOG"/>
+</Event>
+<Event range1="919011101-919011102" range2="919012101" range3="919021001" range4="919022001-919022002" range5="919031001-919031002" range6="919032001">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Cmd FaultLevel="IMPORTANT" PrivacyLevel="L3" run="dumpsys location" output="dumpsys_gps.log"/>
+</Event>
+
+<Event min="915100002" max="915100010">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+    <Import template="TPL_QC_DUMPSYS_Modem"/>
+</Event>
+
+<Event min="915200001" max="915200004">
+    <Import template="TPL_BASE_LOGCAT_LOG"/>
+</Event>
+</Upload>

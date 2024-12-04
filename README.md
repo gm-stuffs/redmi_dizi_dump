@@ -1,0 +1,14 @@
+# missi_pad_cn-user 14 UKQ1.240116.001 V816.0.17.0.UNSCNXM release-keys
+- manufacturer: xiaomi
+- platform: parrot
+- codename: dizi
+- flavor: missi_pad_cn-user
+- release: 14
+- id: UKQ1.240116.001
+- incremental: V816.0.17.0.UNSCNXM
+- tags: release-keys
+- fingerprint: Redmi/dizi/dizi:12/SKQ1.231214.001/V816.0.17.0.UNSCNXM:user/release-keys
+- is_ab: true
+- brand: Redmi
+- branch: missi_pad_cn-user-14-UKQ1.240116.001-V816.0.17.0.UNSCNXM-release-keys
+- repo: redmi_dizi_dump
